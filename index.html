@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>বাংলার শাসন ইতিহাস — ইন্টারঅ্যাকটিভ ম্যাপ</title>
+<meta name="description" content="প্রাচীন যুগ থেকে ইংরেজ শাসন পর্যন্ত বাংলার রাজবংশ, শাসনাঞ্চল, রাজধানী ও সকল শাসকের ইন্টারঅ্যাকটিভ মানচিত্র।">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@400;600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <h1>বাংলার শাসন ইতিহাস</h1>
+    <p>প্রাচীন যুগ থেকে ইংরেজ শাসনের সূচনা — রাজবংশ, রাজধানী, শাসনাঞ্চল ও সকল শাসকের তালিকা</p>
+  </header>
+
+  <nav class="timeline" id="timeline"></nav>
+
+  <main>
+    <!-- ══════ MAP ══════ -->
+    <section class="map-card">
+      <svg class="map" viewBox="0 0 900 730" id="map" aria-label="বাংলার রাজবংশভিত্তিক মানচিত্র">
+        <defs>
+          <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+            <feGaussianBlur stdDeviation="6" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+
+        <path class="landmass" d="M 50,150 Q 100,68 262,80 L 480,68 Q 640,54 800,95 Q 882,150 860,270
+                                 Q 882,400 820,520 Q 760,642 620,690 Q 480,722 360,675
+                                 Q 218,650 150,560 Q 58,470 55,340 Z"/>
+
+        <g id="regions">
+          <polygon class="region" data-region="magadha"    points="70,140 240,100 310,160 300,255 190,300 80,250"/>
+          <polygon class="region" data-region="kamarupa"   points="600,90 800,110 840,220 770,300 640,292 578,190"/>
+          <polygon class="region" data-region="pundra"     points="330,122 560,115 575,215 500,292 380,296 320,206"/>
+          <polygon class="region" data-region="gauda"      points="250,312 420,300 452,382 390,442 280,432 230,372"/>
+          <polygon class="region" data-region="radha"      points="90,322 220,320 250,412 190,482 95,452 65,376"/>
+          <polygon class="region" data-region="vanga"      points="470,312 620,300 666,392 600,472 480,456 450,376"/>
+          <polygon class="region" data-region="samatata"   points="680,300 830,332 860,442 780,522 690,492 660,396"/>
+          <polygon class="region" data-region="tamralipta" points="160,492 330,456 400,532 340,622 200,612 140,546"/>
+          <polygon class="region" data-region="utkala"     points="420,546 580,512 620,612 540,692 420,682 390,602"/>
+        </g>
+
+        <g id="labels"></g>
+      </svg>
+
+      <div class="map-foot">
+        <div>উজ্জ্বল অঞ্চল = <b id="footCount">০</b>টি অঞ্চল শাসনাধীন</div>
+        <div>যেকোনো অঞ্চলে ক্লিক করে জানুন কোন কোন রাজবংশ শাসন করেছে</div>
+      </div>
+
+      <div id="tip"></div>
+    </section>
+
+    <!-- ══════ PANEL ══════ -->
+    <aside class="panel" id="panel"></aside>
+  </main>
+
+  <footer>
+    মানচিত্রটি শিক্ষামূলক ও সাংকেতিক (schematic) — প্রকৃত ভৌগোলিক সীমানা নয়, রাজনৈতিক বিস্তারের আনুমানিক রূপ।<br>
+    ঐতিহাসিক কালপঞ্জি বিভিন্ন সূত্র অনুসারে সামান্য ভিন্ন হতে পারে।
+  </footer>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
