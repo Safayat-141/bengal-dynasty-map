@@ -1,16 +1,52 @@
 /* ═══════════════════════════════════════════════════════════
-   অঞ্চলের তথ্য
+   অঞ্চলের তথ্য — বাস্তব ভৌগোলিক কেন্দ্র ও আনুমানিক সীমানা
    ═══════════════════════════════════════════════════════════ */
 const REGION_META = {
-  magadha:    { bn:'মগধ',          full:'মগধ (দক্ষিণ বিহার)',                     cx:186, cy:200 },
-  kamarupa:   { bn:'কামরূপ',       full:'কামরূপ (আসাম অঞ্চল)',                    cx:712, cy:196 },
-  pundra:     { bn:'পুণ্ড্রবর্ধন',  full:'পুণ্ড্রবর্ধন / বরেন্দ্র (উত্তরবঙ্গ)',      cx:446, cy:202 },
-  gauda:      { bn:'গৌড়',         full:'গৌড় / লক্ষ্মণাবতী (মালদহ–মুর্শিদাবাদ)',  cx:336, cy:372 },
-  radha:      { bn:'রাঢ়',         full:'রাঢ় (পশ্চিমবঙ্গের পশ্চিমাঞ্চল)',         cx:156, cy:386 },
-  vanga:      { bn:'বঙ্গ',         full:'বঙ্গ / ঢাকা–ময়মনসিংহ অঞ্চল',             cx:556, cy:386 },
-  samatata:   { bn:'সমতট',         full:'সমতট / হরিকেল (কুমিল্লা–চট্টগ্রাম)',      cx:756, cy:410 },
-  tamralipta: { bn:'তাম্রলিপ্তি',  full:'তাম্রলিপ্তি (মেদিনীপুর উপকূল)',           cx:266, cy:536 },
-  utkala:     { bn:'উৎকল',        full:'উৎকল / ওডিশা',                          cx:512, cy:602 }
+  magadha:    {
+    bn:'মগধ', full:'মগধ (দক্ষিণ বিহার)',
+    center:[25.0, 85.0],
+    polygon:[[24.5,84.0],[25.5,84.0],[25.5,86.0],[24.5,86.0]]
+  },
+  kamarupa:   {
+    bn:'কামরূপ', full:'কামরূপ (আসাম অঞ্চল)',
+    center:[26.2, 92.0],
+    polygon:[[25.5,91.0],[27.0,91.0],[27.0,93.5],[25.5,93.5]]
+  },
+  pundra:     {
+    bn:'পুণ্ড্রবর্ধন', full:'পুণ্ড্রবর্ধন / বরেন্দ্র (উত্তরবঙ্গ)',
+    center:[25.2, 89.0],
+    polygon:[[24.5,88.0],[25.8,88.0],[25.8,90.0],[24.5,90.0]]
+  },
+  gauda:      {
+    bn:'গৌড়', full:'গৌড় / লক্ষ্মণাবতী (মালদহ–মুর্শিদাবাদ)',
+    center:[24.5, 88.5],
+    polygon:[[23.8,87.8],[25.0,87.8],[25.0,89.2],[23.8,89.2]]
+  },
+  radha:      {
+    bn:'রাঢ়', full:'রাঢ় (পশ্চিমবঙ্গের পশ্চিমাঞ্চল)',
+    center:[23.5, 87.0],
+    polygon:[[22.8,86.0],[24.2,86.0],[24.2,88.0],[22.8,88.0]]
+  },
+  vanga:      {
+    bn:'বঙ্গ', full:'বঙ্গ / ঢাকা–ময়মনসিংহ অঞ্চল',
+    center:[23.8, 90.2],
+    polygon:[[23.0,89.5],[24.5,89.5],[24.5,91.0],[23.0,91.0]]
+  },
+  samatata:   {
+    bn:'সমতট', full:'সমতট / হরিকেল (কুমিল্লা–চট্টগ্রাম)',
+    center:[23.2, 91.5],
+    polygon:[[22.5,91.0],[24.0,91.0],[24.0,92.5],[22.5,92.5]]
+  },
+  tamralipta: {
+    bn:'তাম্রলিপ্তি', full:'তাম্রলিপ্তি (মেদিনীপুর উপকূল)',
+    center:[22.3, 87.3],
+    polygon:[[21.8,86.8],[22.8,86.8],[22.8,88.0],[21.8,88.0]]
+  },
+  utkala:     {
+    bn:'উৎকল', full:'উৎকল / ওডিশা',
+    center:[20.5, 85.5],
+    polygon:[[19.5,84.5],[21.5,84.5],[21.5,87.0],[19.5,87.0]]
+  }
 };
 
 /* ═══════════════════════════════════════════════════════════
@@ -325,27 +361,92 @@ const DYNASTIES = [
 ];
 
 /* ═══════════════════════════════════════════════════════════
-   রেন্ডারিং
+   মানচিত্র ও UI রেন্ডারিং
    ═══════════════════════════════════════════════════════════ */
 const timelineEl = document.getElementById('timeline');
 const panelEl    = document.getElementById('panel');
-const mapEl      = document.getElementById('map');
-const labelsEl   = document.getElementById('labels');
-const tipEl      = document.getElementById('tip');
 const footCount  = document.getElementById('footCount');
 
 let activeId = DYNASTIES[0].id;
+let map;
+let regionLayers = {};   // { regionKey: L.Polygon }
 
-/* ── ম্যাপ লেবেল তৈরি ── */
-Object.entries(REGION_META).forEach(([key, m]) => {
-  const t = document.createElementNS('http://www.w3.org/2000/svg','text');
-  t.setAttribute('class','region-label');
-  t.setAttribute('x', m.cx);
-  t.setAttribute('y', m.cy);
-  t.dataset.region = key;
-  t.textContent = m.bn;
-  labelsEl.appendChild(t);
-});
+/* ── বাংলা সংখ্যা রূপান্তর ── */
+function bnNum(n){
+  const map = ['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
+  return String(n).replace(/\d/g, x => map[+x]);
+}
+
+/* ── মানচিত্রের প্রাথমিক সেটআপ ── */
+function initMap(){
+  // বাংলা অঞ্চলে কেন্দ্রীভূত
+  map = L.map('map', {
+    center: [23.5, 90.0],
+    zoom: 6,
+    zoomControl: true,
+    attributionControl: true
+  });
+
+  // বিশ্বের দেশগুলোর সীমানা (হালকা ধূসর)
+  fetch('https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json')
+    .then(res => res.json())
+    .then(worldData => {
+      L.geoJSON(worldData, {
+        style: {
+          color: 'rgba(255,255,255,0.12)',
+          weight: 0.6,
+          fillColor: '#1a2533',
+          fillOpacity: 0.9
+        },
+        interactive: false
+      }).addTo(map);
+    })
+    .catch(() => {
+      // ব্যাকআপ: যদি GeoJSON লোড না হয়, শুধু কালো ব্যাকগ্রাউন্ড
+      console.warn('World GeoJSON লোড হয়নি — ব্যাকআপ ব্যবহার করা হচ্ছে।');
+    });
+
+  // ঐতিহাসিক অঞ্চলগুলোর polygon লেয়ার
+  Object.entries(REGION_META).forEach(([key, meta]) => {
+    const poly = L.polygon(meta.polygon, {
+      color: 'rgba(255,255,255,0.2)',
+      weight: 1.2,
+      fillColor: 'rgba(255,255,255,0.05)',
+      fillOpacity: 0.6,
+      interactive: true
+    }).addTo(map);
+
+    // টুলটিপ
+    poly.bindTooltip(`${meta.full}`, {
+      sticky: true,
+      direction: 'top',
+      className: 'region-tooltip'
+    });
+
+    // হোভার ইফেক্ট
+    poly.on('mouseover', function(){
+      if (!this._isActive) {
+        this.setStyle({ fillColor: 'rgba(255,255,255,0.15)', weight: 2 });
+      }
+    });
+    poly.on('mouseout', function(){
+      if (!this._isActive) {
+        this.setStyle({ fillColor: 'rgba(255,255,255,0.05)', weight: 1.2 });
+      }
+    });
+
+    // ক্লিক — প্রথম সংশ্লিষ্ট রাজবংশ নির্বাচন
+    poly.on('click', () => {
+      const first = DYNASTIES.find(d => d.regions.includes(key));
+      if (first) select(first.id);
+    });
+
+    regionLayers[key] = poly;
+  });
+
+  // বাংলা অঞ্চলে জুম
+  map.fitBounds([[20.0, 84.0], [27.5, 94.0]], { padding: [20, 20] });
+}
 
 /* ── টাইমলাইন চিপ তৈরি ── */
 DYNASTIES.forEach(d => {
@@ -357,48 +458,40 @@ DYNASTIES.forEach(d => {
   timelineEl.appendChild(b);
 });
 
-/* ── টুলটিপ: কোন অঞ্চলে কোন রাজবংশ ── */
-function rulersOfRegion(regionKey){
-  return DYNASTIES.filter(d => d.regions.includes(regionKey)).map(d => d.short);
-}
-
-document.querySelectorAll('.region').forEach(poly => {
-  const key = poly.dataset.region;
-
-  poly.addEventListener('mousemove', e => {
-    const m = REGION_META[key];
-    const list = rulersOfRegion(key).join(' · ');
-    tipEl.innerHTML = `<b>${m.full}</b><em>শাসন করেছে:</em><br>${list}`;
-    const card = mapEl.parentElement.getBoundingClientRect();
-    tipEl.style.left = (e.clientX - card.left) + 'px';
-    tipEl.style.top  = (e.clientY - card.top) + 'px';
-    tipEl.classList.add('show');
-  });
-
-  poly.addEventListener('mouseleave', () => tipEl.classList.remove('show'));
-
-  poly.addEventListener('click', () => {
-    const first = DYNASTIES.find(d => d.regions.includes(key));
-    if (first) select(first.id);
-  });
-});
-
 /* ── মূল সিলেকশন ফাংশন ── */
 function select(id){
   activeId = id;
   const d = DYNASTIES.find(x => x.id === id);
 
+  // চিপ
   document.querySelectorAll('.chip').forEach(c =>
     c.classList.toggle('active', c.dataset.id === id));
 
-  document.documentElement.style.setProperty('--accent', d.accent);
-  document.querySelectorAll('.region').forEach(p =>
-    p.classList.toggle('active', d.regions.includes(p.dataset.region)));
-  document.querySelectorAll('.region-label').forEach(t =>
-    t.classList.toggle('active', d.regions.includes(t.dataset.region)));
+  // মানচিত্রের লেয়ার স্টাইল
+  Object.entries(regionLayers).forEach(([key, poly]) => {
+    const isActive = d.regions.includes(key);
+    poly._isActive = isActive;
+    if (isActive) {
+      poly.setStyle({
+        color: d.accent,
+        fillColor: d.accent,
+        fillOpacity: 0.45,
+        weight: 2.5
+      });
+      poly.bringToFront();
+    } else {
+      poly.setStyle({
+        color: 'rgba(255,255,255,0.2)',
+        fillColor: 'rgba(255,255,255,0.05)',
+        fillOpacity: 0.6,
+        weight: 1.2
+      });
+    }
+  });
 
   footCount.textContent = bnNum(d.regions.length);
 
+  // প্যানেল
   const regionChips = Object.entries(REGION_META).map(([k, m]) =>
     `<span class="${d.regions.includes(k) ? 'on' : ''}">${m.bn}</span>`).join('');
 
@@ -459,11 +552,6 @@ function select(id){
   panelEl.scrollTop = 0;
 }
 
-/* ── বাংলা সংখ্যা রূপান্তর ── */
-function bnNum(n){
-  const map = ['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
-  return String(n).replace(/\d/g, x => map[+x]);
-}
-
 /* ── আরম্ভ ── */
+initMap();
 select(activeId);
