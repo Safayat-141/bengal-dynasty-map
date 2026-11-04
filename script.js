@@ -425,6 +425,21 @@ function initMap(){
       className: 'region-tooltip'
     });
 
+    // কীবোর্ড ব্যবহারকারীদের জন্য অঞ্চলকেও ফোকাসযোগ্য করুন।
+    setTimeout(() => {
+      const path = poly.getElement();
+      if (!path) return;
+      path.setAttribute('tabindex', '0');
+      path.setAttribute('role', 'button');
+      path.setAttribute('aria-label', `${meta.full} — বিস্তারিত দেখতে Enter চাপুন`);
+      path.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          poly.fire('click');
+        }
+      });
+    }, 0);
+
     // হোভার ইফেক্ট
     poly.on('mouseover', function(){
       if (!this._isActive) {
