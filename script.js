@@ -366,6 +366,8 @@ const DYNASTIES = [
 const timelineEl = document.getElementById('timeline');
 const panelEl    = document.getElementById('panel');
 const footCount  = document.getElementById('footCount');
+const resetMapEl = document.getElementById('resetMap');
+const MAP_BOUNDS = [[20.0, 84.0], [27.5, 94.0]];
 
 let activeId = DYNASTIES[0].id;
 let map;
@@ -435,17 +437,38 @@ function initMap(){
       }
     });
 
-    // ক্লিক — প্রথম সংশ্লিষ্ট রাজবংশ নির্বাচন
+    // ক্লিক করলে অঞ্চলটির সঙ্গে যুক্ত সব রাজবংশ দেখান।
     poly.on('click', () => {
-      const first = DYNASTIES.find(d => d.regions.includes(key));
-      if (first) select(first.id);
+      const dynasties = DYNASTIES.filter(d => d.regions.includes(key));
+      const items = dynasties.map(d =>
+        `<button class="region-dynasty" data-dynasty="${d.id}" style="--dynasty-accent:${d.accent}">${d.short}<span>${d.period.split('–')[0].trim().replace('আনু. ','')}…</span></button>`
+      ).join('');
+      poly.bindPopup(`<div class="region-popup"><strong>${meta.full}</strong><small>এই অঞ্চলে শাসন করেছে</small><div class="region-dynasties">${items}</div></div>`, { maxWidth: 250 }).openPopup();
+      poly.once('popupopen', () => {
+        document.querySelectorAll('.region-dynasty').forEach(button => {
+          button.addEventListener('click', () => {
+            select(button.dataset.dynasty);
+            map.closePopup();
+          });
+        });
+      });
+      const current = dynasties.find(d => d.id === activeId) || dynasties[0];
+      if (current) select(current.id);
     });
 
     regionLayers[key] = poly;
+
+    // অঞ্চল নাম সবসময় দৃশ্যমান রাখুন, যাতে মোবাইলেও অঞ্চল চিনতে সহজ হয়।
+    L.marker(meta.center, {
+      icon: L.divIcon({ className: 'region-label', html: meta.bn, iconSize: null }),
+      interactive: false,
+      zIndexOffset: -100
+    }).addTo(map);
   });
 
   // বাংলা অঞ্চলে জুম
-  map.fitBounds([[20.0, 84.0], [27.5, 94.0]], { padding: [20, 20] });
+  map.fitBounds(MAP_BOUNDS, { padding: [20, 20] });
+  resetMapEl.addEventListener('click', () => map.fitBounds(MAP_BOUNDS, { padding: [20, 20], animate: true }));
 }
 
 /* ── টাইমলাইন চিপ তৈরি ── */

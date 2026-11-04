@@ -31,7 +31,11 @@
   <main>
     <!-- ══════ MAP ══════ -->
     <section class="map-card">
-      <div id="map"></div>
+      <div class="map-toolbar" aria-label="মানচিত্র নিয়ন্ত্রণ">
+        <div class="map-title"><span class="map-kicker">ইতিহাসের ভূগোল</span><strong>শাসনাঞ্চল</strong></div>
+        <button class="map-reset" id="resetMap" type="button">পুরো অঞ্চল দেখুন</button>
+      </div>
+      <div id="map" aria-label="বাংলার ঐতিহাসিক শাসনাঞ্চলের মানচিত্র"></div>
 
       <div class="map-foot">
         <div>উজ্জ্বল অঞ্চল = <b id="footCount">০</b>টি অঞ্চল শাসনাধীন</div>
