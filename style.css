@@ -8,7 +8,10 @@
   --accent:#e0b354;
 }
 *{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
 html,body{height:100%}
+button{font:inherit}
+button:focus-visible,.region:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
 body{
   background:
     radial-gradient(1200px 700px at 15% -10%, #1b2a3a 0%, transparent 60%),
@@ -54,7 +57,41 @@ header p{color:var(--dim);margin-top:8px;font-size:.9rem}
 
 /* ── Layout ── */
 main{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:22px;align-items:start}
-@media(max-width:1000px){main{grid-template-columns:1fr}}
+@media(max-width:1000px){
+  main{grid-template-columns:1fr;gap:16px}
+  .panel{position:relative;top:auto;max-height:none}
+}
+
+@media(max-width:640px){
+  .app{padding:12px 10px 32px}
+  header{padding:10px 4px 16px;margin-bottom:12px}
+  header h1{font-size:clamp(1.35rem,7vw,1.85rem);line-height:1.35}
+  header p{font-size:.78rem;line-height:1.7;margin-top:6px}
+  .timeline{gap:7px;margin:0 -10px 12px;padding:4px 10px 12px;scroll-snap-type:x proximity}
+  .chip{min-height:52px;padding:8px 13px;font-size:.8rem;scroll-snap-align:start}
+  .chip span{font-size:.63rem}
+  .map-card,.panel{border-radius:14px}
+  .map-card{padding:9px}
+  svg.map{min-height:280px}
+  .map-foot{font-size:.68rem;line-height:1.6;gap:3px 10px}
+  .map-foot div:last-child{flex-basis:100%}
+  .panel{padding:16px 14px}
+  .p-name{font-size:1.18rem}
+  .p-period{font-size:.7rem;line-height:1.5}
+  .stats{gap:7px;margin:13px 0}
+  .stat{padding:9px 10px}
+  .stat .v{font-size:.78rem}
+  .sect{margin-top:14px}
+  .sect p{font-size:.8rem;line-height:1.8}
+  .rulers li{padding:10px;font-size:.76rem;min-height:42px}
+  .rulers li .ry{font-size:.68rem;text-align:right}
+  footer{font-size:.68rem;margin-top:22px;padding:0 6px}
+  #tip{display:none}
+}
+
+@media(hover:none){
+  .region:hover,.chip:hover,.rulers li:hover{transform:none}
+}
 
 /* ── Map ── */
 .map-card{
